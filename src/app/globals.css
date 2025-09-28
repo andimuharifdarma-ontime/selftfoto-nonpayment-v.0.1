@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Theme tokens for Tailwind v4 */
+@theme {
+  --color-primary-50: color-mix(in oklch, #71604b 90%, white);
+  --color-primary-100: color-mix(in oklch, #71604b 80%, white);
+  --color-primary-200: color-mix(in oklch, #71604b 65%, white);
+  --color-primary-300: color-mix(in oklch, #71604b 50%, white);
+  --color-primary-400: color-mix(in oklch, #71604b 35%, white);
+  --color-primary-500: #71604b; /* primary */
+  --color-primary-600: color-mix(in oklch, #71604b 85%, black);
+  --color-primary-700: color-mix(in oklch, #71604b 70%, black);
+  --color-primary-800: color-mix(in oklch, #71604b 55%, black);
+  --color-primary-900: color-mix(in oklch, #71604b 40%, black);
+
+  --color-secondary-50: color-mix(in oklch, #f5e8c6 90%, white);
+  --color-secondary-100: color-mix(in oklch, #f5e8c6 80%, white);
+  --color-secondary-200: color-mix(in oklch, #f5e8c6 65%, white);
+  --color-secondary-300: color-mix(in oklch, #f5e8c6 50%, white);
+  --color-secondary-400: color-mix(in oklch, #f5e8c6 35%, white);
+  --color-secondary-500: #f5e8c6; /* secondary */
+  --color-secondary-600: color-mix(in oklch, #f5e8c6 85%, black);
+  --color-secondary-700: color-mix(in oklch, #f5e8c6 70%, black);
+  --color-secondary-800: color-mix(in oklch, #f5e8c6 55%, black);
+  --color-secondary-900: color-mix(in oklch, #f5e8c6 40%, black);
+
+  --color-support-50: color-mix(in oklch, #ffffff 90%, white);
+  --color-support-100: color-mix(in oklch, #ffffff 80%, white);
+  --color-support-200: color-mix(in oklch, #ffffff 65%, white);
+  --color-support-300: color-mix(in oklch, #ffffff 50%, white);
+  --color-support-400: color-mix(in oklch, #ffffff 35%, white);
+  --color-support-500: #ffffff; /* support */
+  --color-support-600: color-mix(in oklch, #ffffff 85%, black);
+  --color-support-700: color-mix(in oklch, #ffffff 70%, black);
+  --color-support-800: color-mix(in oklch, #ffffff 55%, black);
+  --color-support-900: color-mix(in oklch, #ffffff 40%, black);
+}
+
+/* Base CSS variables for background/foreground */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
