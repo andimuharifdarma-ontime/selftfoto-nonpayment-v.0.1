@@ -40,11 +40,12 @@ const PhotoSlot: React.FC<PhotoSlotProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             whileHover={{ opacity: 1 }}
-            className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2"
+            onClick={() => onPreview && onPreview(photo.dataUrl)}
+            className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2 cursor-zoom-in"
           >
             {onRetake && (
               <button
-                onClick={() => onRetake(index)}
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onRetake(index); }}
                 className="p-3 bg-primary-600 hover:bg-primary-700 text-white rounded-full transition-colors"
                 title="Foto Ulang"
               >
@@ -53,7 +54,7 @@ const PhotoSlot: React.FC<PhotoSlotProps> = ({
             )}
             {onRemove && (
               <button
-                onClick={() => onRemove(photo.id)}
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onRemove(photo.id); }}
                 className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
                 title="Hapus Foto"
               >
