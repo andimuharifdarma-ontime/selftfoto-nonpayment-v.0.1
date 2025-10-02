@@ -92,7 +92,7 @@ const FinalResultPage: React.FC = () => {
         const photoWidth = 2000 * 0.8; // 80% of width
         const photoHeight = 6000 * 0.16; // ~16% of height per photo
         const horizontalMargin = (2000 - photoWidth) / 2; // center horizontally
-        const verticalGap = 6000 * 0.04; // 4% vertical gap
+        const verticalGap = 6000 * 0.03; // 4% vertical gap
 
         // Load and draw photos
         const imagePromises = photos.map((photo: PhotoData) => {
@@ -122,7 +122,7 @@ const FinalResultPage: React.FC = () => {
           }
           
           // Position photos in 1x4 vertical strip
-          const topStart = 6000 * 0.02; // bring photos slightly closer to top
+          const topStart = 6000 * 0.07; // bring photos slightly closer to top
           const positions = Array.from({ length: 4 }).map((_, i) => ({
             x: horizontalMargin,
             y: topStart + i * (photoHeight + verticalGap)

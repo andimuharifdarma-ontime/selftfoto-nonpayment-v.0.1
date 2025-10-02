@@ -43,7 +43,7 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
     const photoWidth = width * 0.8; // 80% of frame width per photo (centered)
     const photoHeight = height * 0.16; // each photo ~16% of total height
     const horizontalMargin = (width - photoWidth) / 2; // center horizontally
-    const verticalGap = height * 0.04; // 4% gap between photos
+    const verticalGap = height * 0.03; // 4% gap between photos
 
     // Load and draw photos
     const imagePromises = photos.map(photo => {
@@ -82,7 +82,7 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
       }
       
       // Position photos in 1x4 vertical strip
-      const topStart = height * 0.02; // slightly closer to top to align with corner guides
+      const topStart = height * 0.06; // slightly closer to top to align with corner guides
       const positions = Array.from({ length: 4 }).map((_, i) => ({
         x: horizontalMargin,
         y: topStart + i * (photoHeight + verticalGap)
