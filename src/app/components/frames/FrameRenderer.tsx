@@ -39,11 +39,18 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    // Calculate photo dimensions for 1x4 vertical strip
+    // Calculate photo dimensions for 1x4 vertical strip with safe areas
     const photoWidth = width * 0.8; // 80% of frame width per photo (centered)
-    const photoHeight = height * 0.16; // each photo ~16% of total height
     const horizontalMargin = (width - photoWidth) / 2; // center horizontally
-    const verticalGap = height * 0.04; // 4% gap between photos
+
+    // Reserve safe areas so top logos and bottom text are not overlapped by photos
+    const safeTop = height * 0.08; // 8% top safe area
+    const safeBottom = height * 0.08; // 8% bottom safe area
+    const availableHeight = height - safeTop - safeBottom;
+
+    // Distribute remaining height into 4 photos and 3 gaps
+    const verticalGap = availableHeight * 0.045; // balanced spacing between photos
+    const photoHeight = (availableHeight - 3 * verticalGap) / 4;
 
     // Load and draw photos
     const imagePromises = photos.map(photo => {
@@ -72,17 +79,8 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
       // Draw frame background based on type
       drawFrameBackground(ctx, frameType, width, height);
 
-      // Draw PNG overlay UNDER photos so photos remain visible
-      if (overlayMaybe) {
-        try {
-          ctx.drawImage(overlayMaybe, 0, 0, width, height);
-        } catch (_) {
-          // ignore and proceed
-        }
-      }
-      
-      // Position photos in 1x4 vertical strip
-      const topStart = height * 0.02; // slightly closer to top to align with corner guides
+      // Position photos in 1x4 vertical strip, starting after top safe area
+      const topStart = safeTop;
       const positions = Array.from({ length: 4 }).map((_, i) => ({
         x: horizontalMargin,
         y: topStart + i * (photoHeight + verticalGap)
@@ -122,8 +120,15 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
         }
       });
 
-      // If no overlay was drawn, optionally add decorative strokes on TOP
-      if (!overlayMaybe) {
+      // Draw PNG overlay ON TOP so logos/text are never covered by photos
+      if (overlayMaybe) {
+        try {
+          ctx.drawImage(overlayMaybe, 0, 0, width, height);
+        } catch (_) {
+          // ignore and proceed
+        }
+      } else {
+        // If no overlay available, optionally add decorative strokes on top
         drawFrameDecorations(ctx, frameType, width, height);
       }
 

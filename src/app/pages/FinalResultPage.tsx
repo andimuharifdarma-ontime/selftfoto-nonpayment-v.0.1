@@ -88,11 +88,18 @@ const FinalResultPage: React.FC = () => {
         tempCtx.fillStyle = '#ffffff';
         tempCtx.fillRect(0, 0, 2000, 6000);
 
-        // Calculate photo dimensions for 1x4 vertical strip
+        // Calculate photo dimensions for 1x4 vertical strip with safe areas
         const photoWidth = 2000 * 0.8; // 80% of width
-        const photoHeight = 6000 * 0.16; // ~16% of height per photo
         const horizontalMargin = (2000 - photoWidth) / 2; // center horizontally
-        const verticalGap = 6000 * 0.04; // 4% vertical gap
+
+        // Safe areas to prevent overlap with top logos and bottom text
+        const safeTop = 6000 * 0.08; // 8% top safe area
+        const safeBottom = 6000 * 0.08; // 8% bottom safe area
+        const availableHeight = 6000 - safeTop - safeBottom;
+
+        // Balanced vertical gap and dynamic photo height
+        const verticalGap = availableHeight * 0.045;
+        const photoHeight = (availableHeight - 3 * verticalGap) / 4;
 
         // Load and draw photos
         const imagePromises = photos.map((photo: PhotoData) => {
@@ -108,21 +115,8 @@ const FinalResultPage: React.FC = () => {
           // Draw frame background
           drawFrameBackground(tempCtx, selectedFrame, 2000, 6000);
 
-          // Try drawing PNG overlay UNDER photos (so photos stay visible)
-          try {
-            const overlay = await new Promise<HTMLImageElement>((resolve, reject) => {
-              const img = new Image();
-              img.onload = () => resolve(img);
-              img.onerror = reject;
-              img.src = `/frames/${selectedFrame}.png`;
-            });
-            tempCtx.drawImage(overlay, 0, 0, 2000, 6000);
-          } catch (_) {
-            // ignore if overlay missing
-          }
-          
-          // Position photos in 1x4 vertical strip
-          const topStart = 6000 * 0.02; // bring photos slightly closer to top
+          // Position photos in 1x4 vertical strip starting below top safe area
+          const topStart = safeTop;
           const positions = Array.from({ length: 4 }).map((_, i) => ({
             x: horizontalMargin,
             y: topStart + i * (photoHeight + verticalGap)
@@ -160,9 +154,19 @@ const FinalResultPage: React.FC = () => {
             }
           });
 
-          // Optional decorations if overlay was not available are drawn on top
-          // Keeping them minimal as overlay likely provides final look
-          // drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
+          // Draw PNG overlay ON TOP so it covers above photos
+          try {
+            const overlay = await new Promise<HTMLImageElement>((resolve, reject) => {
+              const img = new Image();
+              img.onload = () => resolve(img);
+              img.onerror = reject;
+              img.src = `/frames/${selectedFrame}.png`;
+            });
+            tempCtx.drawImage(overlay, 0, 0, 2000, 6000);
+          } catch (_) {
+            // If overlay missing, you could draw minimal decorations
+            // drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
+          }
           
           // Convert to blob URL
           tempCanvas.toBlob((blob) => {
