@@ -150,36 +150,41 @@ const FrameSelectionPage: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleFrameSelect(frame.id)}
-                      className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4 ${
                         selectedFrame === frame.id
                           ? 'border-primary-600 bg-primary-50 shadow-lg'
                           : 'border-gray-200 hover:border-primary-400 hover:shadow-md'
                       }`}
                     >
-                      {/* Frame Preview */}
-                      <div className="flex items-center gap-4">
-                        <img
-                          src={frame.url}
-                          alt={frame.name}
-                          className="w-16 h-24 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
-                        />
+                      {/* Thumbnail */}
+                      <img
+                        src={frame.url}
+                        alt={frame.name}
+                        className="w-16 h-24 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
+                      />
 
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-primary-800 mb-1">
-                            {frame.name}
-                          </h3>
-                        </div>
+                      {/* Label */}
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-primary-800 mb-1">
+                          {frame.name}
+                        </h3>
+                      </div>
 
-                        {/* Selection Indicator */}
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                          selectedFrame === frame.id
-                            ? 'bg-primary-600 text-white'
-                            : 'border-2 border-gray-300'
-                        }`}>
-                          {selectedFrame === frame.id && (
-                            <Check className="w-4 h-4" />
-                          )}
-                        </div>
+                      {/* Radio Indicator on the right */}
+                      <div className="ml-auto">
+                        <span
+                          className={`inline-flex h-6 w-6 items-center justify-center rounded-full border transition-colors ${
+                            selectedFrame === frame.id ? 'border-primary-600' : 'border-gray-300'
+                          }`}
+                          aria-checked={selectedFrame === frame.id}
+                          role="radio"
+                        >
+                          <span
+                            className={`h-2.5 w-2.5 rounded-full ${
+                              selectedFrame === frame.id ? 'bg-primary-600' : 'bg-transparent'
+                            }`}
+                          />
+                        </span>
                       </div>
                     </motion.div>
                   ))}
