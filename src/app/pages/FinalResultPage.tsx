@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, QrCode, ArrowLeft, Home } from 'lucide-react';
 import { usePhotoStore } from '@/store/usePhotoStore';
-import type { PhotoData } from '@/store/usePhotoStore';
 import FrameRenderer from '../components/frames/FrameRenderer';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 // removed unused html2canvas
@@ -102,7 +101,7 @@ const FinalResultPage: React.FC = () => {
         const photoHeight = (availableHeight - 3 * verticalGap) / 4;
 
         // Load and draw photos
-        const imagePromises = photos.map((photo: PhotoData) => {
+        const imagePromises = photos.map(photo => {
           return new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve(img);
@@ -111,23 +110,9 @@ const FinalResultPage: React.FC = () => {
           });
         });
 
-        Promise.all(imagePromises).then(async images => {
+        Promise.all(imagePromises).then(images => {
           // Draw frame background
           drawFrameBackground(tempCtx, selectedFrame, 2000, 6000);
-
-          // Attempt to load overlay and draw as BACKGROUND first (pattern/texture)
-          const overlay: HTMLImageElement | null = await new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => resolve(null);
-            img.src = `/frames/${selectedFrame}.png`;
-          });
-          if (overlay) {
-            try {
-              tempCtx.drawImage(overlay, 0, 0, 2000, 6000);
-            } catch {}
-          }
-
           // Position photos in 1x4 vertical strip starting below top safe area
           const topStart = safeTop;
           const positions = Array.from({ length: 4 }).map((_, i) => ({
@@ -135,7 +120,7 @@ const FinalResultPage: React.FC = () => {
             y: topStart + i * (photoHeight + verticalGap)
           }));
 
-          images.forEach((img: HTMLImageElement, index: number) => {
+          images.forEach((img, index) => {
             if (positions[index]) {
               const pos = positions[index];
               tempCtx.save();
@@ -167,29 +152,8 @@ const FinalResultPage: React.FC = () => {
             }
           });
 
-          // Bring TOP and BOTTOM slices of overlay to FRONT (logos/text)
-          if (overlay) {
-            try {
-              const topSlice = Math.floor(safeTop);
-              const bottomSlice = Math.floor(safeBottom);
-              if (topSlice > 0) {
-                tempCtx.drawImage(overlay, 0, 0, 2000, topSlice, 0, 0, 2000, topSlice);
-              }
-              if (bottomSlice > 0) {
-                tempCtx.drawImage(
-                  overlay,
-                  0,
-                  6000 - bottomSlice,
-                  2000,
-                  bottomSlice,
-                  0,
-                  6000 - bottomSlice,
-                  2000,
-                  bottomSlice
-                );
-              }
-            } catch {}
-          }
+          // Draw decorations
+          drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
           
           // Convert to blob URL
           tempCanvas.toBlob((blob) => {
