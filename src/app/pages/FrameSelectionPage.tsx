@@ -1,49 +1,23 @@
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { usePhotoStore } from '@/store/usePhotoStore';
 import FrameRenderer from '../components/frames/FrameRenderer';
 
-interface FrameOption {
+interface FrameItem {
   id: string;
   name: string;
-  description: string;
-  preview: string;
+  url: string;
 }
-
-const frameOptions: FrameOption[] = [
-  {
-    id: 'classic',
-    name: 'Klasik',
-    description: 'Frame putih klasik dengan border elegant',
-    preview: 'bg-white border-4 border-primary-600'
-  },
-  {
-    id: 'vintage',
-    name: 'Vintage',
-    description: 'Frame retro dengan warna sepia hangat',
-    preview: 'bg-gradient-to-b from-secondary-200 to-secondary-300 border-2 border-secondary-500'
-  },
-  {
-    id: 'modern',
-    name: 'Modern',
-    description: 'Design kontemporer dengan gradient mewah',
-    preview: 'bg-gradient-to-br from-primary-600 via-secondary-200 to-primary-600'
-  },
-  {
-    id: 'elegant',
-    name: 'Elegant',
-    description: 'Frame mewah dengan aksen emas',
-    preview: 'bg-gray-900 border-4 border-primary-600'
-  }
-];
 
 const FrameSelectionPage: React.FC = () => {
   const router = useRouter();
   const { photos, selectedFrame, setSelectedFrame } = usePhotoStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [frames, setFrames] = useState<FrameItem[]>([]);
+  const [loadingFrames, setLoadingFrames] = useState(true);
 
   if (photos.length < 4) {
     router.push('/session');
@@ -65,6 +39,34 @@ const FrameSelectionPage: React.FC = () => {
   const handleBack = () => {
     router.push('/session');
   };
+
+  useEffect(() => {
+    let alive = true;
+    const fetchFrames = async () => {
+      try {
+        const res = await fetch('/api/frames', { cache: 'no-store' });
+        const data = await res.json();
+        if (!alive) return;
+        const apiFrames: FrameItem[] = Array.isArray(data.frames) ? data.frames : [];
+        setFrames(apiFrames);
+        if (apiFrames.length > 0 && !apiFrames.find(f => f.id === selectedFrame)) {
+          setSelectedFrame(apiFrames[0].id);
+        }
+      } catch (e) {
+        const fallback: FrameItem[] = [
+          { id: 'classic', name: 'Classic', url: '/frames/classic.png' },
+          { id: 'elegant', name: 'Elegant', url: '/frames/elegant.png' },
+          { id: 'modern', name: 'Modern', url: '/frames/modern.png' },
+          { id: 'vintage', name: 'Vintage', url: '/frames/vintage.png' },
+        ];
+        if (alive) setFrames(fallback);
+      } finally {
+        if (alive) setLoadingFrames(false);
+      }
+    };
+    fetchFrames();
+    return () => { alive = false; };
+  }, [selectedFrame, setSelectedFrame]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-100">
@@ -139,7 +141,7 @@ const FrameSelectionPage: React.FC = () => {
                 </h2>
 
                 <div className="grid gap-4">
-                  {frameOptions.map((frame, index) => (
+                  {(loadingFrames ? [] : frames).map((frame, index) => (
                     <motion.div
                       key={frame.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -156,29 +158,16 @@ const FrameSelectionPage: React.FC = () => {
                     >
                       {/* Frame Preview */}
                       <div className="flex items-center gap-4">
-                        <div className={`w-16 h-24 rounded-lg ${frame.preview} flex-shrink-0 shadow-inner`}>
-                          <div className="w-full h-full p-1">
-                            <div className="grid grid-cols-2 gap-0.5 h-full">
-                              {photos.slice(0, 4).map((photo, i) => (
-                                <div key={i} className="bg-gray-300 rounded-sm overflow-hidden">
-                                  <img 
-                                    src={photo.dataUrl} 
-                                    alt={`Preview ${i + 1}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
+                        <img
+                          src={frame.url}
+                          alt={frame.name}
+                          className="w-16 h-24 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
+                        />
 
                         <div className="flex-1">
                           <h3 className="font-semibold text-primary-800 mb-1">
                             {frame.name}
                           </h3>
-                          <p className="text-sm text-primary-600">
-                            {frame.description}
-                          </p>
                         </div>
 
                         {/* Selection Indicator */}
