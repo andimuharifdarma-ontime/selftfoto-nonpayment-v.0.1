@@ -117,9 +117,9 @@ const FrameSelectionPage: React.FC = () => {
                   <FrameRenderer
                     photos={photos}
                     frameType={selectedFrame}
-                    width={400}
-                    height={1200}
-                    className="w-full"
+                    width={500}
+                    height={1500}
+                    className="w-full max-h-[600px] object-contain"
                   />
                 </div>
 
@@ -141,7 +141,13 @@ const FrameSelectionPage: React.FC = () => {
                 </h2>
 
                 <div className="grid gap-4">
-                  {(loadingFrames ? [] : frames).map((frame, index) => (
+                  {loadingFrames && (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                      <span className="ml-3 text-primary-600">Memuat frame...</span>
+                    </div>
+                  )}
+                  {(!loadingFrames ? frames : []).map((frame, index) => (
                     <motion.div
                       key={frame.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -150,7 +156,7 @@ const FrameSelectionPage: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleFrameSelect(frame.id)}
-                      className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4 ${
+                      className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-6 ${
                         selectedFrame === frame.id
                           ? 'border-primary-600 bg-primary-50 shadow-lg'
                           : 'border-gray-200 hover:border-primary-400 hover:shadow-md'
@@ -160,7 +166,7 @@ const FrameSelectionPage: React.FC = () => {
                       <img
                         src={frame.url}
                         alt={frame.name}
-                        className="w-16 h-24 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
+                        className="w-24 h-36 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
                       />
 
                       {/* Label */}

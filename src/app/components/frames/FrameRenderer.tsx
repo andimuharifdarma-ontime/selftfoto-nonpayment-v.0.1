@@ -97,6 +97,7 @@ export const FrameRenderer: React.FC<FrameRendererProps> = ({
 
       // Position photos in 1x4 vertical strip, starting after top safe area
       const topStart = safeTop;
+      
       const positions = Array.from({ length: 4 }).map((_, i) => ({
         x: horizontalMargin,
         y: topStart + i * (photoHeight + verticalGap)
@@ -162,7 +163,7 @@ export const FrameRenderer: React.FC<FrameRendererProps> = ({
           // ignore and proceed
         }
       } else {
-        // If no overlay available, optionally add decorative strokes on top
+        // If no overlay available, add decorative strokes
         drawFrameDecorations(ctx, frameType, width, height);
       }
 

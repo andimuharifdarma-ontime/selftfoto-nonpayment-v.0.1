@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, QrCode, ArrowLeft, Home } from 'lucide-react';
 import { usePhotoStore } from '@/store/usePhotoStore';
-import { FrameRenderer } from '../components/frames/FrameRenderer';
+import FrameRenderer from '../components/frames/FrameRenderer';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 // removed unused html2canvas
 
@@ -102,6 +102,7 @@ const FinalResultPage: React.FC = () => {
 
         // Load and draw photos
         const imagePromises = photos.map(photo => {
+        const imagePromises = photos.map(photo => {
           return new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve(img);
@@ -111,15 +112,20 @@ const FinalResultPage: React.FC = () => {
         });
 
         Promise.all(imagePromises).then(images => {
+        Promise.all(imagePromises).then(images => {
           // Draw frame background
           drawFrameBackground(tempCtx, selectedFrame, 2000, 6000);
           // Position photos in 1x4 vertical strip starting below top safe area
           const topStart = safeTop;
+          
+          // Position photos in 1x4 vertical strip
+          const topStart = 6000 * 0.02; // bring photos slightly closer to top
           const positions = Array.from({ length: 4 }).map((_, i) => ({
             x: horizontalMargin,
             y: topStart + i * (photoHeight + verticalGap)
           }));
 
+          images.forEach((img, index) => {
           images.forEach((img, index) => {
             if (positions[index]) {
               const pos = positions[index];
@@ -152,6 +158,8 @@ const FinalResultPage: React.FC = () => {
             }
           });
 
+          // Draw decorations
+          drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
           // Draw decorations
           drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
           
