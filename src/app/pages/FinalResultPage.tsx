@@ -92,9 +92,9 @@ const FinalResultPage: React.FC = () => {
         const photoWidth = 2000 * 0.8; // 80% of width
         const horizontalMargin = (2000 - photoWidth) / 2; // center horizontally
 
-        // Safe areas to prevent overlap with top logos and bottom text
-        const safeTop = 6000 * 0.08; // 8% top safe area
-        const safeBottom = 6000 * 0.08; // 8% bottom safe area
+        // Safe areas to prevent overlap with top logos and bottom text (~2cm top)
+        const safeTop = 6000 * 0.04; // ~2cm on 6000px height
+        const safeBottom = 6000 * 0.06; // slightly larger bottom area
         const availableHeight = 6000 - safeTop - safeBottom;
 
         // Balanced vertical gap and dynamic photo height
@@ -114,6 +114,19 @@ const FinalResultPage: React.FC = () => {
         Promise.all(imagePromises).then(async images => {
           // Draw frame background
           drawFrameBackground(tempCtx, selectedFrame, 2000, 6000);
+
+          // Attempt to load overlay and draw as BACKGROUND first (pattern/texture)
+          const overlay: HTMLImageElement | null = await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = `/frames/${selectedFrame}.png`;
+          });
+          if (overlay) {
+            try {
+              tempCtx.drawImage(overlay, 0, 0, 2000, 6000);
+            } catch {}
+          }
 
           // Position photos in 1x4 vertical strip starting below top safe area
           const topStart = safeTop;
@@ -154,18 +167,28 @@ const FinalResultPage: React.FC = () => {
             }
           });
 
-          // Draw PNG overlay ON TOP so it covers above photos
-          try {
-            const overlay = await new Promise<HTMLImageElement>((resolve, reject) => {
-              const img = new Image();
-              img.onload = () => resolve(img);
-              img.onerror = reject;
-              img.src = `/frames/${selectedFrame}.png`;
-            });
-            tempCtx.drawImage(overlay, 0, 0, 2000, 6000);
-          } catch (_) {
-            // If overlay missing, you could draw minimal decorations
-            // drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
+          // Bring TOP and BOTTOM slices of overlay to FRONT (logos/text)
+          if (overlay) {
+            try {
+              const topSlice = Math.floor(safeTop);
+              const bottomSlice = Math.floor(safeBottom);
+              if (topSlice > 0) {
+                tempCtx.drawImage(overlay, 0, 0, 2000, topSlice, 0, 0, 2000, topSlice);
+              }
+              if (bottomSlice > 0) {
+                tempCtx.drawImage(
+                  overlay,
+                  0,
+                  6000 - bottomSlice,
+                  2000,
+                  bottomSlice,
+                  0,
+                  6000 - bottomSlice,
+                  2000,
+                  bottomSlice
+                );
+              }
+            } catch {}
           }
           
           // Convert to blob URL

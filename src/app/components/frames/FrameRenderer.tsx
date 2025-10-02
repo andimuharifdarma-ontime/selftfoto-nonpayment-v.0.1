@@ -44,8 +44,9 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
     const horizontalMargin = (width - photoWidth) / 2; // center horizontally
 
     // Reserve safe areas so top logos and bottom text are not overlapped by photos
-    const safeTop = height * 0.08; // 8% top safe area
-    const safeBottom = height * 0.08; // 8% bottom safe area
+    // ~2cm on a 6000px height ≈ 236px at 300DPI => ~4% of height
+    const safeTop = height * 0.04; // top safe area (~2cm)
+    const safeBottom = height * 0.06; // a bit larger bottom area for captions/logos
     const availableHeight = height - safeTop - safeBottom;
 
     // Distribute remaining height into 4 photos and 3 gaps
@@ -78,6 +79,15 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
 
       // Draw frame background based on type
       drawFrameBackground(ctx, frameType, width, height);
+
+      // If overlay exists, draw it as BACKGROUND first (so pattern/background appears behind photos)
+      if (overlayMaybe) {
+        try {
+          ctx.drawImage(overlayMaybe, 0, 0, width, height);
+        } catch (_) {
+          // ignore and proceed if overlay fails
+        }
+      }
 
       // Position photos in 1x4 vertical strip, starting after top safe area
       const topStart = safeTop;
@@ -120,10 +130,28 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
         }
       });
 
-      // Draw PNG overlay ON TOP so logos/text are never covered by photos
+      // After photos, bring only the TOP and BOTTOM slices of overlay to FRONT
+      // so logos/captions are above photos while the middle remains visible.
       if (overlayMaybe) {
         try {
-          ctx.drawImage(overlayMaybe, 0, 0, width, height);
+          const topSlice = Math.floor(safeTop);
+          const bottomSlice = Math.floor(safeBottom);
+          if (topSlice > 0) {
+            ctx.drawImage(overlayMaybe, 0, 0, width, topSlice, 0, 0, width, topSlice);
+          }
+          if (bottomSlice > 0) {
+            ctx.drawImage(
+              overlayMaybe,
+              0,
+              height - bottomSlice,
+              width,
+              bottomSlice,
+              0,
+              height - bottomSlice,
+              width,
+              bottomSlice
+            );
+          }
         } catch (_) {
           // ignore and proceed
         }
