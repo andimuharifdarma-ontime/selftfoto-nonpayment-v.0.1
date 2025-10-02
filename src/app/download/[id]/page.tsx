@@ -102,8 +102,8 @@ const DownloadPage: React.FC<DownloadPageProps> = ({ params }) => {
             onClick={handleGoHome}
             className="flex items-center gap-2 text-primary-600 hover:text-primary-800 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Kembali</span>
+            {/* <ArrowLeft className="w-5 h-5" />
+            <span>Kembali</span> */}
           </button>
           
           <div className="text-center">
@@ -119,8 +119,8 @@ const DownloadPage: React.FC<DownloadPageProps> = ({ params }) => {
             onClick={handleGoHome}
             className="flex items-center gap-2 text-primary-600 hover:text-primary-800 transition-colors"
           >
-            <Home className="w-5 h-5" />
-            <span>Beranda</span>
+            {/* <Home className="w-5 h-5" />
+            <span>Beranda</span> */}
           </button>
         </div>
       </motion.header>
@@ -137,7 +137,7 @@ const DownloadPage: React.FC<DownloadPageProps> = ({ params }) => {
               Hasil Photobooth (2000 × 6000 px)
             </h2>
             
-            <div className="border-4 border-primary-200 rounded-2xl overflow-hidden">
+            <div className="border-4 border-primary-200 p-6 rounded-2xl overflow-hidden">
               <img
                 src={imageUrl}
                 alt="Photobooth Result"

@@ -73,8 +73,12 @@ export const FrameRenderer: React.FC<FrameRendererProps> = ({
     });
 
     try {
-      const images = await Promise.all(imagePromises);
-      
+      // Load photos and overlay in parallel
+      const [images, overlayMaybe] = await Promise.all([
+        Promise.all(imagePromises),
+        loadImage(`/frames/${frameType}.png`).catch(() => null as unknown as HTMLImageElement)
+      ]);
+
       // Draw frame background based on type
       drawFrameBackground(ctx, frameType, width, height);
 
