@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, QrCode, ArrowLeft, Home } from 'lucide-react';
 import { usePhotoStore } from '@/store/usePhotoStore';
+import type { PhotoData } from '@/store/usePhotoStore';
 import FrameRenderer from '../components/frames/FrameRenderer';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 // removed unused html2canvas
@@ -94,7 +95,7 @@ const FinalResultPage: React.FC = () => {
         const verticalGap = 6000 * 0.04; // 4% vertical gap
 
         // Load and draw photos
-        const imagePromises = photos.map(photo => {
+        const imagePromises = photos.map((photo: PhotoData) => {
           return new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve(img);
@@ -103,9 +104,22 @@ const FinalResultPage: React.FC = () => {
           });
         });
 
-        Promise.all(imagePromises).then(images => {
+        Promise.all(imagePromises).then(async images => {
           // Draw frame background
           drawFrameBackground(tempCtx, selectedFrame, 2000, 6000);
+
+          // Try drawing PNG overlay UNDER photos (so photos stay visible)
+          try {
+            const overlay = await new Promise<HTMLImageElement>((resolve, reject) => {
+              const img = new Image();
+              img.onload = () => resolve(img);
+              img.onerror = reject;
+              img.src = `/frames/${selectedFrame}.png`;
+            });
+            tempCtx.drawImage(overlay, 0, 0, 2000, 6000);
+          } catch (_) {
+            // ignore if overlay missing
+          }
           
           // Position photos in 1x4 vertical strip
           const topStart = 6000 * 0.02; // bring photos slightly closer to top
@@ -114,7 +128,7 @@ const FinalResultPage: React.FC = () => {
             y: topStart + i * (photoHeight + verticalGap)
           }));
 
-          images.forEach((img, index) => {
+          images.forEach((img: HTMLImageElement, index: number) => {
             if (positions[index]) {
               const pos = positions[index];
               tempCtx.save();
@@ -146,8 +160,9 @@ const FinalResultPage: React.FC = () => {
             }
           });
 
-          // Draw decorations
-          drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
+          // Optional decorations if overlay was not available are drawn on top
+          // Keeping them minimal as overlay likely provides final look
+          // drawFrameDecorations(tempCtx, selectedFrame, 2000, 6000);
           
           // Convert to blob URL
           tempCanvas.toBlob((blob) => {

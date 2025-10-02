@@ -63,10 +63,23 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
     });
 
     try {
-      const images = await Promise.all(imagePromises);
-      
+      // Load photos and overlay in parallel
+      const [images, overlayMaybe] = await Promise.all([
+        Promise.all(imagePromises),
+        loadImage(`/frames/${frameType}.png`).catch(() => null as unknown as HTMLImageElement)
+      ]);
+
       // Draw frame background based on type
       drawFrameBackground(ctx, frameType, width, height);
+
+      // Draw PNG overlay UNDER photos so photos remain visible
+      if (overlayMaybe) {
+        try {
+          ctx.drawImage(overlayMaybe, 0, 0, width, height);
+        } catch (_) {
+          // ignore and proceed
+        }
+      }
       
       // Position photos in 1x4 vertical strip
       const topStart = height * 0.02; // slightly closer to top to align with corner guides
@@ -109,12 +122,8 @@ const FrameRenderer: React.FC<FrameRendererProps> = ({
         }
       });
 
-      // Try to overlay PNG design if available in public/frames/<frameType>.png
-      try {
-        const overlay = await loadImage(`/frames/${frameType}.png`);
-        ctx.drawImage(overlay, 0, 0, width, height);
-      } catch (_) {
-        // If PNG is not found, fall back to optional decorative strokes
+      // If no overlay was drawn, optionally add decorative strokes on TOP
+      if (!overlayMaybe) {
         drawFrameDecorations(ctx, frameType, width, height);
       }
 
