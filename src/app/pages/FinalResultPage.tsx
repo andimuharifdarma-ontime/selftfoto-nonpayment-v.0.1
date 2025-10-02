@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, QrCode, ArrowLeft, Home } from 'lucide-react';
 import { usePhotoStore } from '@/store/usePhotoStore';
-import FrameRenderer from '../components/frames/FrameRenderer';
+import { FrameRenderer } from '../components/frames/FrameRenderer';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 // removed unused html2canvas
 
