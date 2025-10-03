@@ -117,9 +117,9 @@ const FrameSelectionPage: React.FC = () => {
                   <FrameRenderer
                     photos={photos}
                     frameType={selectedFrame}
-                    width={500}
-                    height={1500}
-                    className="w-full max-h-[600px] object-contain"
+                    width={400}
+                    height={1200}
+                    className="w-full"
                   />
                 </div>
 
@@ -141,13 +141,7 @@ const FrameSelectionPage: React.FC = () => {
                 </h2>
 
                 <div className="grid gap-4">
-                  {loadingFrames && (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
-                      <span className="ml-3 text-primary-600">Memuat frame...</span>
-                    </div>
-                  )}
-                  {(!loadingFrames ? frames : []).map((frame, index) => (
+                  {(loadingFrames ? [] : frames).map((frame, index) => (
                     <motion.div
                       key={frame.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -156,41 +150,36 @@ const FrameSelectionPage: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleFrameSelect(frame.id)}
-                      className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-6 ${
+                      className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         selectedFrame === frame.id
                           ? 'border-primary-600 bg-primary-50 shadow-lg'
                           : 'border-gray-200 hover:border-primary-400 hover:shadow-md'
                       }`}
                     >
-                      {/* Thumbnail */}
-                      <img
-                        src={frame.url}
-                        alt={frame.name}
-                        className="w-24 h-36 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
-                      />
+                      {/* Frame Preview */}
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={frame.url}
+                          alt={frame.name}
+                          className="w-16 h-24 rounded-lg object-contain bg-white flex-shrink-0 shadow-inner"
+                        />
 
-                      {/* Label */}
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-primary-800 mb-1">
-                          {frame.name}
-                        </h3>
-                      </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-primary-800 mb-1">
+                            {frame.name}
+                          </h3>
+                        </div>
 
-                      {/* Radio Indicator on the right */}
-                      <div className="ml-auto">
-                        <span
-                          className={`inline-flex h-6 w-6 items-center justify-center rounded-full border transition-colors ${
-                            selectedFrame === frame.id ? 'border-primary-600' : 'border-gray-300'
-                          }`}
-                          aria-checked={selectedFrame === frame.id}
-                          role="radio"
-                        >
-                          <span
-                            className={`h-2.5 w-2.5 rounded-full ${
-                              selectedFrame === frame.id ? 'bg-primary-600' : 'bg-transparent'
-                            }`}
-                          />
-                        </span>
+                        {/* Selection Indicator */}
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                          selectedFrame === frame.id
+                            ? 'bg-primary-600 text-white'
+                            : 'border-2 border-gray-300'
+                        }`}>
+                          {selectedFrame === frame.id && (
+                            <Check className="w-4 h-4" />
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   ))}
