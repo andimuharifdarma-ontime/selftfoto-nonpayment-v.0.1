@@ -1,5 +1,3 @@
-'use client';
-
 import { useRef, useEffect } from 'react';
 import type { PhotoData } from '@/store/usePhotoStore';
 
@@ -11,7 +9,7 @@ interface FrameRendererProps {
   className?: string;
 }
 
-export const FrameRenderer: React.FC<FrameRendererProps> = ({
+const FrameRenderer: React.FC<FrameRendererProps> = ({
   photos,
   frameType,
   width = 2000,
@@ -41,19 +39,11 @@ export const FrameRenderer: React.FC<FrameRendererProps> = ({
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    // Calculate photo dimensions for 1x4 vertical strip with safe areas
+    // Calculate photo dimensions for 1x4 vertical strip
     const photoWidth = width * 0.8; // 80% of frame width per photo (centered)
+    const photoHeight = height * 0.16; // each photo ~16% of total height
     const horizontalMargin = (width - photoWidth) / 2; // center horizontally
-
-    // Reserve safe areas so top logos and bottom text are not overlapped by photos
-    // ~2cm on a 6000px height ≈ 236px at 300DPI => ~4% of height
-    const safeTop = height * 0.04; // top safe area (~2cm)
-    const safeBottom = height * 0.06; // a bit larger bottom area for captions/logos
-    const availableHeight = height - safeTop - safeBottom;
-
-    // Distribute remaining height into 4 photos and 3 gaps
-    const verticalGap = availableHeight * 0.045; // balanced spacing between photos
-    const photoHeight = (availableHeight - 3 * verticalGap) / 4;
+    const verticalGap = height * 0.03; // 4% gap between photos
 
     // Load and draw photos
     const imagePromises = photos.map(photo => {
@@ -82,26 +72,17 @@ export const FrameRenderer: React.FC<FrameRendererProps> = ({
       // Draw frame background based on type
       drawFrameBackground(ctx, frameType, width, height);
 
-      // Attempt to load overlay image (if available)
-      let overlayMaybe: HTMLImageElement | null = null;
-      try {
-        overlayMaybe = await loadImage(`/frames/${frameType}.png`);
-      } catch (_) {
-        overlayMaybe = null;
-      }
-
-      // If overlay exists, draw it as BACKGROUND first (so pattern/background appears behind photos)
+      // Draw PNG overlay UNDER photos so photos remain visible
       if (overlayMaybe) {
         try {
           ctx.drawImage(overlayMaybe, 0, 0, width, height);
         } catch (_) {
-          // ignore and proceed if overlay fails
+          // ignore and proceed
         }
       }
-
-      // Position photos in 1x4 vertical strip, starting after top safe area
-      const topStart = safeTop;
       
+      // Position photos in 1x4 vertical strip
+      const topStart = height * 0.06; // slightly closer to top to align with corner guides
       const positions = Array.from({ length: 4 }).map((_, i) => ({
         x: horizontalMargin,
         y: topStart + i * (photoHeight + verticalGap)
@@ -141,33 +122,8 @@ export const FrameRenderer: React.FC<FrameRendererProps> = ({
         }
       });
 
-      // After photos, bring only the TOP and BOTTOM slices of overlay to FRONT
-      // so logos/captions are above photos while the middle remains visible.
-      if (overlayMaybe) {
-        try {
-          const topSlice = Math.floor(safeTop);
-          const bottomSlice = Math.floor(safeBottom);
-          if (topSlice > 0) {
-            ctx.drawImage(overlayMaybe, 0, 0, width, topSlice, 0, 0, width, topSlice);
-          }
-          if (bottomSlice > 0) {
-            ctx.drawImage(
-              overlayMaybe,
-              0,
-              height - bottomSlice,
-              width,
-              bottomSlice,
-              0,
-              height - bottomSlice,
-              width,
-              bottomSlice
-            );
-          }
-        } catch (_) {
-          // ignore and proceed
-        }
-      } else {
-        // If no overlay available, add decorative strokes
+      // If no overlay was drawn, optionally add decorative strokes on TOP
+      if (!overlayMaybe) {
         drawFrameDecorations(ctx, frameType, width, height);
       }
 
