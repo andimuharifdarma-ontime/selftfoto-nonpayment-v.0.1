@@ -22,16 +22,28 @@ const VideoStartPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline // Penting untuk autoplay di beberapa browser mobile
+        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+      >
+        <source src="/bacround-video/final.mp4" type="video/mp4" />
+        Browser Anda tidak mendukung tag video.
+      </video>
       {/* Header */}
       <motion.header
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="p-6 text-center"
       >
-        <h1 className="text-4xl md:text-6xl font-bold text-primary-800 mb-2">
-          Self Photobooth
+        {/* className="text-4xl md:text-6xl font-bold text-primary-800 mb-2" setingan asli */}
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">
+          Selft Photobooth
         </h1>
-        <p className="text-lg text-primary-600">
+        {/* className="text-lg text-primary-600" */}
+        <p className="text-lg text-white">
           Ambil 4 foto terbaik Anda dengan mudah
         </p>
       </motion.header>
@@ -41,7 +53,7 @@ const VideoStartPage: React.FC = () => {
         <div className="max-w-4xl w-full grid md:grid-cols-2 gap-8 items-center">
           
           {/* Video Preview */}
-          <motion.div
+          {/* <motion.div
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -51,7 +63,7 @@ const VideoStartPage: React.FC = () => {
               className="aspect-[4/3] w-full"
               autoStart={true}
             />
-          </motion.div>
+          </motion.div> */}
 
           {/* Action Panel */}
           <motion.div
@@ -60,7 +72,7 @@ const VideoStartPage: React.FC = () => {
             transition={{ delay: 0.4 }}
             className="text-center space-y-6"
           >
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div className="p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
                 <Camera className="w-16 h-16 text-primary-600 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-primary-800 mb-2">
@@ -83,10 +95,10 @@ const VideoStartPage: React.FC = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span>Posisi terpusat</span>
                   </div>
-                </div>
+                </div> */}
                 
                 {/* Permission Helper Button */}
-                {!isReady && (
+                {/* {!isReady && (
                   <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center gap-2 text-blue-800 mb-2">
                       <Shield className="w-4 h-4" />
@@ -99,9 +111,9 @@ const VideoStartPage: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
-            <motion.button
+            {/* <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleStartSession}
@@ -109,7 +121,7 @@ const VideoStartPage: React.FC = () => {
             >
               <span className="text-lg">Foto Sekarang</span>
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            </motion.button> */}
           </motion.div>
         </div>
       </div>
@@ -122,10 +134,10 @@ const VideoStartPage: React.FC = () => {
         className="p-6 bg-white/60 backdrop-blur-sm border-t border-primary-200"
       >
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-lg font-semibold text-primary-800 mb-2 text-center">
+          <h3 className="text-lg pb-2 font-semibold text-primary-800 mb-2 text-center">
             Cara Penggunaan:
           </h3>
-          <div className="grid md:grid-cols-4 gap-4 text-center">
+          <div className="grid pb-3 md:grid-cols-4 gap-2 text-center">
             <div className="space-y-2">
               <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto font-bold">1</div>
               <p className="text-sm text-primary-700">Pastikan kamera aktif</p>
@@ -143,6 +155,15 @@ const VideoStartPage: React.FC = () => {
               <p className="text-sm text-primary-700">Download hasil</p>
             </div>
           </div>
+          <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStartSession}
+              className="group w-full max-w-sm mx-auto bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-8 rounded-2xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3"
+            >
+              <span className="text-lg">Foto Sekarang</span>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
         </div>
       </motion.footer>
     </div>
